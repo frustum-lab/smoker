@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smoker Dashboard</title>
+    
+    <!-- PWA Settings -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff9f0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Smoker">
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="glass-panel">
+            <h1>SMOKER <span class="accent">PRO</span></h1>
+            <div class="status-indicator">
+                <span id="conn-dot" class="dot disconnected"></span>
+                <span id="conn-text">Offline</span>
+            </div>
+        </header>
+
+        <!-- Temperature Display -->
+        <section class="temp-display glass-panel">
+            <div class="gauge-ring" id="gauge-ring">
+                <div class="temp-value"><span id="curr-temp">--</span><span class="unit">°C</span></div>
+                <div class="temp-target">TGT: <span id="tgt-temp">--</span>°C</div>
+            </div>
+            <div class="state-badge" id="state-badge">UNKNOWN</div>
+        </section>
+
+        <!-- Graph Section (Real-time) -->
+        <section class="graph-section glass-panel">
+            <h2>Real-time Monitor (Last 30m)</h2>
+            <div class="chart-container">
+                <canvas id="tempChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Graph Section (History) -->
+        <section class="graph-section glass-panel">
+            <h2>History & Import Viewer</h2>
+            <div class="chart-container">
+                <canvas id="historyChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Session Info -->
+        <section class="controls glass-panel">
+            <h2>Session Info & Notes</h2>
+            <div class="control-grid">
+                <div class="control-item">
+                    <label>Date</label>
+                    <input type="date" id="info-date">
+                </div>
+                <div class="control-item">
+                    <label>Food</label>
+                    <input type="text" id="info-food" placeholder="e.g. Bacon, Salmon">
+                </div>
+                <div class="control-item">
+                    <label>Location</label>
+                    <input type="text" id="info-location" placeholder="e.g. Backyard, Balcony">
+                </div>
+            </div>
+            <div class="control-item" style="margin-top: 10px;">
+                <label>Notes</label>
+                <textarea id="info-notes" rows="3" style="width: 100%; background: rgba(0,0,0,0.2); border: 1px solid #444; color: white; border-radius: 5px; padding: 8px;" placeholder="Any special details..."></textarea>
+            </div>
+        </section>
+
+        <!-- Controls -->
+        <section class="controls glass-panel">
+            <h2>Temperature Control</h2>
+            <div class="control-grid">
+                <div class="control-item">
+                    <label>Target Temp (°C)</label>
+                    <input type="number" id="input-target" min="0" max="100" step="1" value="60">
+                </div>
+            </div>
+            <button class="primary-btn" id="btn-start-temp">START AUTO CONTROL</button>
+        </section>
+
+        <!-- PID Tuning -->
+        <section class="controls glass-panel">
+            <h2>PID Tuning (Advanced)</h2>
+            <div class="control-grid">
+                <div class="control-item">
+                    <label>P Gain (Kp)</label>
+                    <input type="number" id="input-kp" min="0" max="100" step="0.1" value="10.0">
+                </div>
+                <div class="control-item">
+                    <label>I Gain (Ki)</label>
+                    <input type="number" id="input-ki" min="0" max="10" step="0.01" value="0.05">
+                </div>
+                <div class="control-item">
+                    <label>D Gain (Kd)</label>
+                    <input type="number" id="input-kd" min="0" max="100" step="0.1" value="5.0">
+                </div>
+                <div class="control-item">
+                    <label>PWM Cycle (ms)</label>
+                    <input type="number" id="input-win" min="10000" max="600000" step="1000" value="120000">
+                </div>
+            </div>
+            <button class="primary-btn" id="btn-save-pid">SAVE PID CONFIG</button>
+        </section>
+
+        <!-- Overrides -->
+        <section class="overrides glass-panel">
+            <h2>Manual Overrides</h2>
+             <div class="button-grid">
+                <button class="action-btn warning" id="btn-force-on">FORCE ON</button>
+                <button class="action-btn info" id="btn-monitor">MONITOR</button>
+                <button class="action-btn danger" id="btn-idle">STOP / IDLE</button>
+             </div>
+        </section>
+
+        <!-- Data Management -->
+        <section class="overrides glass-panel">
+            <h2>Data Logs</h2>
+            <div class="button-grid">
+                <button class="action-btn info" id="btn-download-log">DOWNLOAD CSV</button>
+                <button class="action-btn info" id="btn-import-trigger">IMPORT CSV</button>
+                <input type="file" id="input-import-log" accept=".csv" style="display: none;">
+                <button class="action-btn danger" id="btn-clear-log">CLEAR LOG</button>
+            </div>
+        </section>
+
+        <!-- System Configuration -->
+        <section class="controls glass-panel">
+            <h2>System Configuration</h2>
+            <div style="margin-top: 10px; text-align: center;">
+                <a href="setup.html" class="action-btn info" style="display: block; text-decoration: none; padding: 12px; border-radius: 8px;">WIFI & MEROSS SETUP</a>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('SW registered: ', registration.scope);
+                }).catch(err => {
+                    console.log('SW registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+</html>

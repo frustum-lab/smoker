@@ -1,0 +1,17 @@
+{
+    "name": "Smoker Pro Dashboard",
+    "short_name": "Smoker",
+    "description": "Smart Smoker Controller",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#121212",
+    "theme_color": "#ff9f0a",
+    "icons": [
+        {
+            "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBmaWxsPSIjZmY5ZjBhIj48cGF0aCBkPSJNMzg0IDI1NmMwLTE3LjctMTQuMy0zMi0zMi0zMnMtMzIgMTQuMy0zMiAzMmMwIDg4LjQtNzEuNiAxNjAtMTYwIDE2MHMtMTYwLTcxLjYtMTYwLTE2MEMwIDExNC42IDcxLjYgNDMgMTYwIDQzYzQ0LjIgMCA4NC4yIDE3LjkgMTEzLjIgNDcuNGw0NS4zLTQ1LjNDMjc5LjcgNi45IDIyMS42LTEyIDE2MC0xMkMwIDcyIDEyIDIzMiAxMiA0MTJzMTQ4IDM0MCAzMjggMzQwYzQ0LjIgMCA4NC4yLTE3LjkgMTEzLjItNDcuNGw0NS4zLTQ1LjNDMjc5LjcgNTA1LjEgMjIxLjYgNTI0IDE2MCA1MjRjLTE3Ni43IDAtMzIwLTE0My4zLTMyMC0zMjBTMTQzLjMgMTE2IDMyMCAxMTZjMTcuNyAwIDMyIDE0LjMgMzIgMzJzLTE0LjMgMzItMzIgMzJjLTg4LjQgMC0xNjAgNzEuNi0xNjAgMTYwczcxLjYgMTYwIDE2MCAxNjBjNDQuMiAwODQuMi0xNy45IDExMy4yLTQ3LjRsNDUuMyA0NS4zQzI3OS43IDM3My4xIDIyMS42IDM5MiAxNjAgMzkyYy0xNzYuNyAwLTMyMC0xNDMuMy0zMjAtMzIwczE0My4zLTMyMCAzMjAtMzIwejQxNiAxNjB2MTkyYzAgMTcuNyAxNC4zIDMyIDMyIDMyczMyLTE0LjMgMzItMzJWMTYwYzAtMTcuNy0xNC4zLTMyLTMyLTMycy0zMiAxNC4zLTMyIDMyem0tNjQtNjR2MzIwYzAgMTcuNyAxNC4zIDMyIDMyIDMyczMyLTE0LjMgMzItMzJWOTZjMC0xNy43LTE0LjMtMzItMzItMzJzLTMyIDE0LjMtMzIgMzJ6Ii8+PC9zdmc+",
+            "sizes": "192x192",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
+}

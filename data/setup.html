@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smoker Setup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .setup-container { text-align: center; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 5px; color: var(--text-meta); font-size: 13px; text-transform: uppercase;}
+        .input-group input { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--panel-border); border-radius: 10px; color: #fff; font-size: 16px; outline: none; font-family: 'Roboto', sans-serif;}
+        .input-group input:focus { border-color: var(--accent-orange); }
+        h1 { margin-bottom: 20px; }
+        p.desc { font-size: 13px; color: #bbb; margin-bottom: 30px; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="app-container setup-container">
+        <header class="glass-panel" style="justify-content: center; margin-bottom: 20px;">
+            <h1>SMOKER <span class="accent">SETUP</span></h1>
+        </header>
+
+        <section class="glass-panel">
+            <p class="desc">Please connect the device to your Home Wi-Fi and link your Meross Smart Plug.</p>
+            
+            <form id="setup-form">
+                <h2>Wi-Fi Network</h2>
+                <div class="input-group">
+                    <label>Network Name (SSID)</label>
+                    <input type="text" id="wifi-ssid" required placeholder="e.g. MyHomeNetwork">
+                </div>
+                <div class="input-group" style="margin-bottom: 40px;">
+                    <label>Password</label>
+                    <input type="password" id="wifi-pass" placeholder="Leave blank if open Wi-Fi">
+                </div>
+
+                <h2>Meross Plug Details</h2>
+                <div class="input-group">
+                    <label>Device UUID</label>
+                    <input type="text" id="meross-uuid" placeholder="Optional (e.g. 251203904408...)">
+                </div>
+                <div class="input-group">
+                    <label>Secret Key</label>
+                    <input type="text" id="meross-key" placeholder="Optional">
+                </div>
+                <div class="input-group">
+                    <label>Plug IP Address</label>
+                    <input type="text" id="meross-ip" placeholder="Optional (e.g. 192.168.0.2)">
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button type="submit" class="primary-btn" id="btn-save">SAVE & RESTART</button>
+                </div>
+            </form>
+        </section>
+    </div>
+    
+    <script>
+        // 設定を読み込んでフォームにセットする
+        window.addEventListener('load', async () => {
+            try {
+                const res = await fetch('/config');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.wifi && data.wifi.ssid) {
+                        document.getElementById('wifi-ssid').value = data.wifi.ssid;
+                        if (data.wifi.password_set) {
+                            document.getElementById('wifi-pass').placeholder = "(Saved - leave blank to keep)";
+                        }
+                    }
+                    if (data.meross && data.meross.uuid) {
+                        document.getElementById('meross-uuid').value = data.meross.uuid;
+                        if (data.meross.key_set) {
+                            document.getElementById('meross-key').placeholder = "(Saved - leave blank to keep)";
+                        }
+                        if (data.meross.ip) {
+                            document.getElementById('meross-ip').value = data.meross.ip;
+                        }
+                    }
+                }
+            } catch(err) {
+                console.log("Could not load existing config (might be first boot).");
+            }
+        });
+
+        document.getElementById('setup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save');
+            btn.innerText = "SAVING...";
+            btn.style.opacity = 0.5;
+            
+            const params = new URLSearchParams();
+            params.append("ssid", document.getElementById('wifi-ssid').value);
+            params.append("pass", document.getElementById('wifi-pass').value);
+            params.append("uuid", document.getElementById('meross-uuid').value);
+            params.append("key", document.getElementById('meross-key').value);
+            params.append("ip", document.getElementById('meross-ip').value);
+            
+            try {
+                const res = await fetch('/api/setup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params
+                });
+                if(res.ok) {
+                    document.body.innerHTML = '<div class="app-container setup-container"><div class="glass-panel"><h2 style="color:#34c759;font-size:20px;">Saved Successfully!</h2><p class="desc" style="margin-top:20px;font-size:15px;">The device is restarting.<br><br>Please reconnect your phone to your <strong>Home Wi-Fi</strong>, then use your home network to access the new Controller Dashboard.</p></div></div>';
+                }
+            } catch(err) {
+                alert("Failed to save. Make sure you are connected to SMOKER-SETUP Wi-Fi.");
+                btn.innerText = "SAVE & RESTART";
+                btn.style.opacity = 1;
+            }
+        });
+    </script>
+</body>
+</html>
